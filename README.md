@@ -50,33 +50,17 @@ hutech_chatbot_vistral/
    ```powershell
    ollama list
    ```
-6. (Tùy chọn) sanitize dữ liệu gốc trước khi ingest:
+6. Ingest file .docx vào Chroma:
    ```powershell
-   python src\sanitize_sample.py data\raw_hutech.docx data\sample_hutech.docx
-   ```
-   Trong archive mình đã kèm `data/sample_hutech.docx` để test.
-7. Ingest file .docx vào Chroma:
-   ```powershell
-   python src\ingest_docx.py --input data\sample_hutech.docx --persist ./chroma_db
+   python ../ingest_docx.py --input data/sample_hutech.docx
    ```
    Thao tác này sẽ tạo thư mục `chroma_db/` (KHÔNG commit thư mục này lên Git).
-8. Chạy Flask API:
+7. Chạy Flask API:
    ```powershell
-   $env:OLLAMA_HOST='http://localhost:11434'
-   $env:OLLAMA_MODEL='ontocord/vistral:latest'
-   $env:CHROMA_PERSIST_DIR='./chroma_db'
    python src\app_ollama.py
-   ```
-9. Gửi truy vấn thử (PowerShell curl):
-   ```powershell
-   Invoke-RestMethod -Uri http://127.0.0.1:7860/query -Method POST -ContentType 'application/json' -Body (@{question='Lịch thi học kỳ 1 2025 là gì?'} | ConvertTo-Json)
    ```
 
 ## Ghi chú quan trọng
 - **Không** commit model weights (`models/`) hoặc `chroma_db/` vào GitHub.
 - Nếu Ollama trả lỗi OOM khi load model, cân nhắc chọn model nhẹ hơn hoặc tăng RAM/swap.
 - Kiểm tra logs của Ollama (cửa sổ nơi bạn chạy `ollama serve`) để debug lỗi gọi REST.
-
-## Liên hệ / Tùy chỉnh
-- Nếu bạn muốn mình thêm UI web đơn giản (HTML/JS) hoặc React widget, mình có thể bổ sung.
-- Nếu muốn chuyển sang llama.cpp/gpt4all thay vì Ollama, mình hỗ trợ chuyển đổi mã.
