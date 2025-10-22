@@ -1,33 +1,30 @@
 # HUTECH Chatbot — Vistral (ontocord/vistral) + Ollama + Chroma (Local RAG)
 
 **Mục tiêu:** prototype RAG trả lời câu hỏi sinh viên HUTECH bằng dữ liệu trong file `.docx`.
-Model chạy local via **Ollama**: `ontocord/vistral:latest` (không kèm model weights trong repo).
+Model chạy local via **Ollama**: `ontocord/vistral` (không kèm model weights trong repo).
 
 ## Yêu cầu
 - Windows (PowerShell) — hướng dẫn dùng PowerShell trong README.
 - Python 3.9+
-- Ollama đã cài và đã `ollama pull ontocord/vistral:latest`.
+- Ollama đã cài và đã `ollama pull ontocord/vistral`.
 - RAM: >= 8GB recommended for Vistral-7B; nếu máy yếu, dùng model nhẹ hơn.
 
 ## Cấu trúc
 ```
 hutech_chatbot_vistral/
-  data/                    # sample sanitized .docx (included)
-  src/
-    ingest_docx.py         # ingest .docx -> chunk -> embeddings -> Chroma
-    app_ollama.py          # Flask API: query -> retrieval -> call Ollama REST
-    sanitize_sample.py     # simple sanitizer for demo
-  .env.example
-  .gitignore
-  requirements.txt
-  README.md
-  Dockerfile
-  run_windows.ps1          # helper script for Windows (PowerShell)
+   data/                   
+      -sample_hutech.docx
+   ingest_docx.py         # ingest .docx -> chunk -> embeddings -> Chroma
+   app_ollama.py          # Flask API: query -> retrieval -> call Ollama REST
+   .env.example
+   .gitignore
+   requirements.txt
+   README.md
 ```
 
 ## Hướng dẫn chạy (Windows, PowerShell)
 
-1. Mở PowerShell, chuyển tới thư mục chứa file `hutech_chatbot_vistral.zip` và giải nén (hoặc clone repo nếu trên Git).
+1. Mở PowerShell, chuyển tới thư mục chứa file `hutech_chatbot_project` vừa giải nén (hoặc clone repo nếu trên Git).
 2. Tạo virtualenv và kích hoạt:
    ```powershell
    python -m venv chatbotvenv
@@ -52,12 +49,12 @@ hutech_chatbot_vistral/
    ```
 6. Ingest file .docx vào Chroma:
    ```powershell
-   python ../ingest_docx.py --input data/sample_hutech.docx
+   python ingest_docx.py --input data/sample_hutech.docx
    ```
    Thao tác này sẽ tạo thư mục `chroma_db/` (KHÔNG commit thư mục này lên Git).
 7. Chạy Flask API:
    ```powershell
-   python src\app_ollama.py
+   python app_ollama.py
    ```
 
 ## Ghi chú quan trọng
