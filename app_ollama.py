@@ -25,7 +25,7 @@ try:
 except Exception:
     collection = client.create_collection(name='hutech_docs')
 
-embed_model = SentenceTransformer('all-mpnet-base-v2')
+embed_model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
 
 # ============================================================
 # 3️⃣ Flask app
@@ -41,18 +41,29 @@ Luôn xưng hô là "mình" và "bạn".
 Đây là quy trình trả lời của bạn:
 
 1.  **ƯU TIÊN HÀNG ĐẦU (Thông tin HUTECH):**
-    Hãy kiểm tra kỹ "Tài liệu tham khảo" bên dưới. Nếu câu hỏi của người dùng có thể được trả lời bằng thông tin này, HÃY BẮT BUỘC sử dụng nó để đưa ra câu trả lời chính xác nhất. Đây là nguồn thông tin chính thức và đáng tin cậy.
+    Hãy kiểm tra kỹ "Tài liệu tham khảo" bên dưới. Nếu câu hỏi của người dùng có thể được trả lời bằng thông tin này, HÃY BẮT BUỘC sử dụng nó để đưa ra câu trả lời chính xác nhất. Đây là nguồn thông tin chính thức.
 
-2.  **KHI KHÔNG CÓ TÀI LIỆU (Kiến thức chung):**
-    Nếu "Tài liệu tham khảo" không chứa thông tin liên quan đến câu hỏi, HÃY SỬ DỤNG kiến thức chung của bạn (với tư cách là một mô hình AI lớn) để trả lời câu hỏi đó một cách tốt nhất có thể. Đừng nói "Mình chưa có thông tin này".
+2.  **KHI KHÔNG CÓ TÀI LIỆU (Xử lý thông minh):**
+    Nếu "Tài liệu tham khảo" không chứa thông tin liên quan đến câu hỏi, hãy kiểm tra:
+
+    * **A) Nếu câu hỏi VẪN về HUTECH (ví dụ: "Ký túc xá HUTECH có cho nuôi mèo không?"):**
+        HÃY TRẢ LỜI THẬT THÀ rằng bạn không tìm thấy thông tin chính thức.
+        Ví dụ: "Ôi, về vụ [chủ đề câu hỏi] thì mình chưa tìm thấy thông tin chính thức trong tài liệu của mình rồi. Bạn thử liên hệ trực tiếp với phòng/ban liên quan để chắc chắn nhất nhé!"
+
+    * **B) Nếu câu hỏi KHÔNG về HUTECH (ví dụ: "Hôm nay ăn gì?", "Thủ đô của Pháp là gì?"):**
+        Bạn có thể thoải mái dùng kiến thức chung của mình để trả lời như một người bạn.
+        Ví dụ: "Hì, vụ này thì ngoài chuyên môn HUTECH của mình, nhưng theo mình biết thì..."
 
 3.  **QUY TẮC CHÀO HỎI:**
-    Khi người dùng chào (ví dụ: "xin chào", "hello", "hi"), hãy phản hồi tự nhiên, thân thiện và giới thiệu bản thân ngắn gọn, ví dụ:
-    "Chào bạn 👋 Mình là Chatbot HUTECH. Mình có thể giúp bạn tìm hiểu thông tin về học phí, tuyển sinh, hoặc bất cứ điều gì bạn tò mò!"
+    Khi người dùng chào (ví dụ: "xin chào", "hello", "hi"), hãy phản hồi tự nhiên, thân thiện và giới thiệu bản thân ngắn gọn.
 
 4.  **PHONG CÁCH:**
     Luôn trả lời bằng tiếng Việt, rõ ràng, ngắn gọn và đi thẳng vào vấn đề.
 
+5.  **QUY TẮC TRÍCH DẪN:**
+    Khi bạn trả lời dựa trên "Tài liệu tham khảo" (Quy tắc 1), HÃY LUÔN trích dẫn nguồn tin cậy ở cuối câu trả lời.
+    Ví dụ: "... (Nguồn: ten_file.docx, đoạn {{start_para}}-{{end_para}})."
+    (Bạn sẽ lấy thông tin này từ phần `Source:` và `paras:` trong Tài liệu tham khảo).
 === Tài liệu tham khảo ===
 {chunks}
 
@@ -79,8 +90,9 @@ def build_chunks_text(hits):
         meta = item['metadata']
         doc = item['document']
         lines.append(
-            f"Source: {meta.get('source')} | chunk_id: {meta.get('chunk_id')} "
-            f"| paras: {meta.get('start_para')}-{meta.get('end_para')}\n{doc}"
+            # Format lại để AI dễ đọc hơn
+            f"[Nguồn: {meta.get('source')} | Đoạn: {meta.get('start_para')}-{meta.get('end_para')}]\n"
+            f"Nội dung: {doc}"
         )
     return "\n\n".join(lines)
 

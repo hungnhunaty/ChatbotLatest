@@ -47,7 +47,7 @@ def main(input_path, persist_dir):
     chunks = chunk_paragraphs(paras, max_chars=900)
     print(f'Paragraphs: {len(paras)}, Chunks: {len(chunks)}')
 
-    model = SentenceTransformer('all-mpnet-base-v2')
+    model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
     texts = [c[0] for c in chunks]
     metas = []
     for i, (_, m) in enumerate(chunks):
